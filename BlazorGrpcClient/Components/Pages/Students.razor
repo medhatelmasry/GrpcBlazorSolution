@@ -1,0 +1,44 @@
+﻿@page "/"
+@inject StudentRemote.StudentRemoteClient _grpcClient
+@attribute [StreamRendering(true)]
+
+<h1>Students</h1>
+
+@if (students == null) {
+  <p><em>Loading...</em></p>
+} else {
+  <table class='table table-hover'>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>School</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in students)
+      {
+        <tr>
+          <td>@item.StudentId</td>
+          <td>@item.FirstName</td>
+          <td>@item.LastName</td>
+          <td>@item.School</td>
+          <td><a class="btn btn-success btn-sm" href="/update-student/@item.StudentId">edit</a></td>
+          <td><a class="btn btn-danger btn-sm" href="/delete-student/@item.StudentId">del</a></td> 
+        </tr>
+        }
+    </tbody>
+  </table>
+}
+
+@code {
+  List<BlazorGrpcClient.StudentModel>? students;
+  protected override async Task OnInitializedAsync() {
+        var replyAllStudents = await _grpcClient.RetrieveAllStudentsAsync(new Empty());
+        students = replyAllStudents.Items.ToList();
+  }
+}
+
